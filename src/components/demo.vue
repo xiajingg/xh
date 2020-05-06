@@ -1,68 +1,72 @@
 <template>
-  <div>
-    <el-container>
-      <el-header>
-      </el-header>
-      <el-main align="center">
-        <div id="img">
-          <img :src="url" style="height: 100px;">
-        </div>
-      </el-main>
-      <el-main align="center" style="color: white">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</el-main>
-      <el-main align="center">
-        <video
-          id="myVideo"
-          height="264"
-          class="video-js"
-        >
-          <source
-            src="https://ksv-video-publish.cdn.bcebos.com/cfcbe0b4462d1ec9b0272d56bc9fc27cdb3bb853.mp4?auth_key=1634453222-0-0-b3a2ace5da21013392243d29f4a566f6"
-            type="video/mp4"
-          >
-        </video>
-      </el-main>
-      <el-main align="center" style="color: gainsboro">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</el-main>
-    </el-container>
+  <div align="center">
+    <div :style="{'width':divWith}">
+      <el-container>
+        <el-header height="10px">
+        </el-header>
+        <el-main align="center">
+          <div id="img">
+            <img :src="url" style="height: 80px;">
+          </div>
+        </el-main>
+        <el-main align="center" style="color: white">XXXXXXXXXXXXXXX
+          XXXXXXXXXXXXXXXX
+        </el-main>
+        <el-main align="center">
+          <div id="mse" align="center"></div>
+        </el-main>
+        <el-main align="center" style="color: gainsboro">XXXXXXXXXXXXXXXXXXXXXXXX</el-main>
+      </el-container>
+    </div>
   </div>
 </template>
+<!--<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>-->
+
 <script>
+  import Player from 'xgplayer'
   export default {
     name: "TestTwo",
     data() {
       return {
         url: 'https://fuss10.elemecdn.com/2/11/6535bcfb26e4c79b48ddde44f4b6fjpeg.jpeg',
-        fits: 'none'
+        fits: 'none',
+        videoUrl: 'http://kaixuan-video.oss-cn-shanghai.aliyuncs.com/1588517044001627.mp4',
+        divWith: '100%'
       };
     },
     mounted() {
-      this.initVideo();
+      var time = new Date().getTime()
+      if (window.innerWidth > 1000) {
+        this.divWith = '600px';
+      }
+      if (time > 1588559004000) {
+        this.initVideo();
+      } else {
+        alert('false')
+      }
     },
     methods: {
       initVideo() {
-        //初始化视频方法
-        let myPlayer = this.$video(myVideo, {
-          //确定播放器是否具有用户可以与之交互的控件。没有控件，启动视频播放的唯一方法是使用autoplay属性或通过Player API。
-          controls: false,
-          //自动播放属性,muted:静音播放
+        let player = new Player({
+          id: 'mse',
+          url: 'http://kaixuan-video.oss-cn-shanghai.aliyuncs.com/1588517044001627.mp4',
           autoplay: true,
-          muted: false,
-          //建议浏览器是否应在<video>加载元素后立即开始下载视频数据。
-          preload: "auto",
-          fluid: true,
-          breakpoints: {
-            tiny: 300,
-            xsmall: 400,
-            small: 500,
-            medium: 600,
-            large: 700,
-            xlarge: 800,
-            huge: 900
-          }
+          loop: true,
+          ignores: ['progress', 'time', 'fullscreen','loading'],
+          "playsinline": true,
+          "whitelist": [
+            ""
+          ],
+          "autoplay": true,
+          "fluid": true,
+          "volume": 1,
+          "x5-video-player-type": "h5",
+          "x5-video-orientation": "landscape",
+          "x5-video-player-fullscreen": "false",
+          playsinline: true,
+          cssFullscreen: true,
+          poster: 'https://dss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=2676242820,1295870088&fm=85&app=92&f=JPEG?w=121&h=75&s=7BA4AF465030738C987B577903009078',
         });
-        // 隐藏原有全屏按钮
-        $(".vjs-fullscreen-control.vjs-control.vjs-button").css("display","none");
-        // 手动添加全屏按钮
-        $(".vjs-control-bar").append('<button class="vjs-fullscreen-control vjs-control vjs-button" type="button" title="Fullscreen" aria-disabled="false" id="danmu_send_opt" onclick="toggleFullScreen()"><span aria-hidden="true" class="vjs-icon-placeholder"></span></button>');
       }
     }
   };
@@ -71,6 +75,7 @@
   body {
     background-color: black;
   }
+
   #img {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
