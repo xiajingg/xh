@@ -18,7 +18,9 @@
     "video.js": "^7.7.5",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
-    "xgplayer": "^2.6.18"
+    "xgplayer": "^2.6.18",
+    "xgplayer-flv": "^2.3.9",
+    "xgplayer-flv.js": "^2.1.2"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

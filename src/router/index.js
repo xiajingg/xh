@@ -14,8 +14,11 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'demo',
-      component: demo
+      name: '首页',
+      component: demo,
+      meta: {
+        title: '首页'
+      }
     }
   ]
 })

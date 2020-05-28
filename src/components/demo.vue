@@ -2,71 +2,121 @@
   <div align="center">
     <div :style="{'width':divWith}">
       <el-container>
-        <el-header height="10px">
+        <el-header height="0px">
         </el-header>
-        <el-main align="center">
-          <div id="img">
-            <img :src="url" style="height: 80px;">
-          </div>
+        <el-main align="center" style="padding:0">
+          <img :src="upUrl" width="100%">
         </el-main>
-        <el-main align="center" style="color: white">XXXXXXXXXXXXXXX
-          XXXXXXXXXXXXXXXX
+        <el-main align="center" style="padding:0">
+          <div id="mse" width="100%"></div>
+          <div id="mse2" width="100%"></div>
         </el-main>
-        <el-main align="center">
-          <div id="mse" align="center"></div>
+        <el-main align="center" style="padding: 0">
+          <img :src="downUrl" width="100%">
         </el-main>
-        <el-main align="center" style="color: gainsboro">XXXXXXXXXXXXXXXXXXXXXXXX</el-main>
       </el-container>
     </div>
   </div>
 </template>
-<!--<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>-->
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
 
 <script>
   import Player from 'xgplayer'
+  import FlvJsPlayer from 'xgplayer-flv.js';
+
   export default {
     name: "TestTwo",
     data() {
       return {
-        url: 'https://fuss10.elemecdn.com/2/11/6535bcfb26e4c79b48ddde44f4b6fjpeg.jpeg',
+        upUrl: 'https://kaixuan-video.oss-cn-shanghai.aliyuncs.com/up.jpg',
+        downUrl: 'https://kaixuan-video.oss-cn-shanghai.aliyuncs.com/down.jpg',
         fits: 'none',
-        videoUrl: 'http://kaixuan-video.oss-cn-shanghai.aliyuncs.com/1588517044001627.mp4',
-        divWith: '100%'
+        // videoUrl: 'http://kaixuan-video.oss-cn-shanghai.aliyuncs.com/1588517044001627.mp4',
+        divWith: '100%',
+        flvHeight: this.divWith / 1.78,
+        vedioTime: 0,
+        isRotateFullscreen: true,
       };
     },
     mounted() {
       var time = new Date().getTime()
       if (window.innerWidth > 1000) {
         this.divWith = '600px';
+        this.isRotateFullscreen = false
       }
-      if (time > 1588559004000) {
+       var playTime= time-1590594660000
+       var vedioTime= 152;
+      if (playTime>=0 && playTime <= vedioTime*1000) {
+        this.vedioTime = playTime/1000;
+        console.log("直播")
         this.initVideo();
-      } else {
-        alert('false')
+      } else if(playTime > vedioTime*1000){
+        this.reloadVedio();
+        console.log("录播")
+      }else {
+        console.log("未开播")
+        var delayTime=1590594660000-time;
+        console.log(delayTime)
+        setTimeout(this.initVideo,delayTime)
       }
     },
     methods: {
       initVideo() {
-        let player = new Player({
+        console.log("开播")
+        let player = new FlvJsPlayer({
           id: 'mse',
-          url: 'http://kaixuan-video.oss-cn-shanghai.aliyuncs.com/1588517044001627.mp4',
-          autoplay: true,
-          loop: true,
-          ignores: ['progress', 'time', 'fullscreen','loading'],
-          "playsinline": true,
-          "whitelist": [
-            ""
-          ],
           "autoplay": true,
-          "fluid": true,
-          "volume": 1,
-          "x5-video-player-type": "h5",
-          "x5-video-orientation": "landscape",
-          "x5-video-player-fullscreen": "false",
-          playsinline: true,
-          cssFullscreen: true,
-          poster: 'https://dss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=2676242820,1295870088&fm=85&app=92&f=JPEG?w=121&h=75&s=7BA4AF465030738C987B577903009078',
+          type: 'mp4',
+          url: 'http://kaixuan-video.oss-cn-shanghai.aliyuncs.com/t1.mp4',
+          // cssFullscreen: true,
+          isLive: true,
+          // loop: true,
+          // duration: 30,
+          // filesize: 1000,
+          // ignores: ['fullscreen'],
+          cors: true,
+          width: this.divWith,
+          height: this.flvHeight,
+          "playsinline": true,
+          rotateFullscreen: this.isRotateFullscreen,
+          closeVideoClick: true,
+          closeVideoTouch: true
+
         });
+        player.once('canplay', () => {
+          player.currentTime = this.vedioTime;
+        })
+        player.once('ended', () => {
+          console.log("销毁视频")
+          player.destroy()
+        })
+        player.once('destroy', () => {
+          console.log("调用重置vedio")
+          this.reloadVedio()
+        })
+      },
+      reloadVedio() {
+        console.log("开始重置")
+        let player = new Player({
+          id: 'mse2',
+          "autoplay": true,
+          type: 'mp4',
+          url: 'http://kaixuan-video.oss-cn-shanghai.aliyuncs.com/1588517044001627.mp4',
+          // cssFullscreen: true,
+          loop: true,
+          controls: true,
+          // duration: 30,
+          // filesize: 1000,
+          // ignores: ['fullscreen'],
+          cors: true,
+          width: this.divWith,
+          height: this.flvHeight,
+          "playsinline": true,
+          // rotateFullscreen: this.isRotateFullscreen,
+          closeVideoClick: true,
+          closeVideoTouch: true
+        });
+        console.log("重置完成")
       }
     }
   };
@@ -74,14 +124,21 @@
 <style>
   body {
     background-color: black;
+    margin: 0;
   }
 
-  #img {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
-  }
+  /*#img, #img2 {*/
+  /*  font-family: 'Avenir', Helvetica, Arial, sans-serif;*/
+  /*  -webkit-font-smoothing: antialiased;*/
+  /*  -moz-osx-font-smoothing: grayscale;*/
+  /*  text-align: center;*/
+  /*  color: #2c3e50;*/
+  /*}*/
+
+  /*.text {*/
+  /*  text-align:justify; text-justify:inter-ideograph;*/
+  /*  width:90%;*/
+  /*  padding: 0 0 0 0;*/
+  /*}*/
+  /*.span_hid{ display:inline-block; width:100%;}*/
 </style>
